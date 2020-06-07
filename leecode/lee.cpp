@@ -957,3 +957,218 @@ int Solution::maxSubArray(vector<int> &nums){
     }
     return result;
 }
+
+vector<bool> Solution::kidsWithCandies(vector<int> &candies, int extraCandies){
+    int max_value = 0;
+    int length = int(candies.size());
+    vector<bool> res(length,false);
+    for (int i=0; i<length; i++) {
+        max_value = (candies[i]>max_value ? candies[i]:max_value);
+    }
+    for (int i=0; i<length; i++) {
+        res[i] = (candies[i]+extraCandies>=max_value ? true:false);
+    }
+    return res;
+}
+
+int Solution::sumNums(int n){
+    n && (n+=sumNums(n-1));
+    return n;
+}
+
+int NumArray::sumRange(int i, int j){
+    // 可以插入一个虚拟 0 作为li数组中的第一个元素。这个技巧可以避免在 sumrange 函数中进行额外的条件检查
+    if (i!=0) {
+        return li[j]-li[i-1];
+    }else{
+        if (j==0) {
+            return li[0];
+        }else{
+            return li[j];
+        }
+    }
+    
+}
+
+NumArray::NumArray(vector<int>& nums){
+    int res = 0;
+    for (int i=0; i<int(nums.size()); i++) {
+        res += nums[i];
+        li.push_back(res);
+    }
+}
+
+vector<int> Solution::productExceptSelf(vector<int> &nums){
+    int length = int(nums.size());
+    vector<int> pre(length);
+    pre[0] = 1;
+    vector<int> suf(length+1);
+    suf[length] = 1;
+    for (int i=0; i<length-1; i++) {
+        pre[i+1] = nums[i]*pre[i];
+    }
+    for (int i=length-1; i>=0; i--) {       // 在计算后缀积的时候还可以接着计算结果乘积
+        suf[i] = nums[i]*suf[i+1];
+    }
+    vector<int> res(length);  // 可以直接拿pre数组存储结果，不用另外申请
+    for (int i=0; i<length; i++) {
+        res[i] = pre[i]*suf[i+1];
+    }
+    return res;
+}
+
+vector<int> Solution::spiralOrder(vector<vector<int> > &matrix){
+    vector<int> res;
+    if (matrix.size()==0) {
+        return res;
+    }
+    int length_o = int(matrix.size());
+    int length_i = int(matrix.front().size());
+    int top=0;
+    int bottom=length_o-1;
+    int left=0;
+    int right=length_i-1;
+    if (top==bottom && left==right) {
+        res.push_back(matrix[0][0]);
+        return res;
+    }else{
+        if (top==bottom) {
+            for (int i=0; i<right; i++) {
+            res.push_back(matrix[0][i]);
+        }
+            return res;
+    }
+        if (left==right) {
+            for (int i=0; i<bottom; i++) {
+                res.push_back(matrix[i][0]);
+            }
+            return res;
+        }
+    }
+    while (bottom-top>=0 || right-left>=0) {
+        for (int i=left; i<=right; i++) {
+            cout << matrix[top][i] << endl;
+            res.push_back(matrix[top][i]);
+        }
+        for (int i=top+1; i<=bottom; i++) {
+            cout << matrix[i][right] << endl;
+            res.push_back(matrix[i][right]);
+        }
+        if (bottom-top>0) {
+            for (int i=right-1; i>=left; i--) {
+                cout << matrix[bottom][i] << endl;
+                res.push_back(matrix[bottom][i]);
+            }
+        }
+        if (right-left>0) {
+            for (int i=bottom-1; i>=top+1; i--) {
+                cout << matrix[i][left] << endl;
+                res.push_back(matrix[i][left]);
+            }
+
+        }
+        top++;
+        bottom--;
+        left++;
+        right--;
+    }
+    return res;
+}
+
+
+int Solution::longestConsecutive(vector<int> &nums){
+    unordered_set<int> set;
+    int res=0;
+    for (int n:nums) {
+        set.insert(n);  // 有重复
+    }
+    int currnum;
+    int l;
+    for (int n:nums) {
+        if (set.find(n-1)==set.end()) {  // 这一步优化可以避免无意义的循环
+            currnum = n;
+            //cout << currnum << endl;
+            l = 1;
+            while (set.find(currnum+1)!=set.end()) {
+                l++;
+                currnum++;
+            }
+            res = (l>res ? l:res);
+        }
+    }
+    return res;
+}
+
+vector<vector<string>> Solution::findLadders(string beginWord, string endWord, vector<string> &wordList){
+    const int INF = 1 << 20;
+    unordered_map<string, int> wordId;
+    vector<string> idWord;
+    vector<vector<int>> edges;
+    int id = 0;                                             //为每个单词创建一个ID，使用哈希表实现
+    for (const string& word : wordList) {                   
+        if (!wordId.count(word)) {                          //如果哈希表中找不到对应单词
+            wordId[word] = id++;                            //则为此单词映射一个ID，先赋值，再++
+            idWord.push_back(word);
+        }
+    }
+    if (!wordId.count(endWord)) {
+        return {};
+    }
+    if (!wordId.count(beginWord)) {                         //把beginWord也加入
+        wordId[beginWord] = id++;
+        idWord.push_back(beginWord);
+    }
+    
+    edges.resize(idWord.size());                            //例子中size=6，edges存储所有距离为1的单词
+    for (int i = 0; i < idWord.size(); i++) {
+        for (int j = i + 1; j < idWord.size(); j++) {
+            if (one_diff(idWord[i], idWord[j])) {
+                edges[i].push_back(j);
+                edges[j].push_back(i);                      //得到对应单词相连的单词，是个二维
+            }
+        }
+    }
+    const int dest = wordId[endWord];                       //保存尾词的索引，即为终点
+    vector<vector<string>> res;                             //保存结果
+    queue<vector<int>> q;                                   //创建队列
+    
+    vector<int> cost(id, INF);                              //cost[i]表示beginWord对应的点
+                                                            //到第i个点的代价（即转换次数）
+                                                            //初始情况下其所有元素初始化为无穷大
+    q.push(vector<int>{wordId[beginWord]});
+    cost[wordId[beginWord]] = 0;
+    while (!q.empty()) {
+        vector<int> now = q.front();
+        q.pop();
+        int last = now.back();                              //得到数组的最后一个单元的引用，此时为单词id
+        if (last == dest) {                                 //如果到达了终点
+            vector<string> tmp;
+            for (int index : now) {
+                tmp.push_back(idWord[index]);
+            }
+            res.push_back(tmp);                             //保存结果
+        } else {
+            for (int i = 0; i < edges[last].size(); i++) {  //遍历和最后一个单词距离为1的单词数组
+                int to = edges[last][i];                    //得到这个单词在单词表中的索引，也即为id
+                if (cost[last] + 1 <= cost[to]) {           //这个判断用于保存最短路径
+                    cost[to] = cost[last] + 1;
+                    vector<int> tmp(now);
+                    tmp.push_back(to);
+                    q.push(tmp);
+                }
+            }
+        }
+    }
+    return res;
+}
+
+bool Solution::one_diff(string& a, string& b){
+    int length = int(a.size());
+    int diff=0;
+    for (int i=0; i<length; i++) {
+        if (a[i]!=b[i]) {
+            diff++;
+        }
+    }
+    return (diff==1 ? true:false);
+}

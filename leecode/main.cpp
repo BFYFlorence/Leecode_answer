@@ -9,7 +9,10 @@
 #include "lee.hpp"
 int main(int argc, const char * argv[]) {
     Solution sol = Solution();
-    vector<int> nums{-2,1,-3,4,-1,2,1,-5,4};
-    int result = sol.maxSubArray(nums);
-    cout << result << endl;
+    unordered_map<string, int> res;
+    vector<int> now{1,2,3,4,56};
+    vector<int> tmp(now);
+    for (int n:tmp ){
+        cout << n << endl;
+    }
 }

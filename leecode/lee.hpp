@@ -12,11 +12,11 @@
 #include <stdio.h>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
 #include <iostream>
 #include <stack>
 using namespace std;
-
 
 class Solution {
 public:
@@ -133,11 +133,25 @@ public:
     int largestRectangleArea(vector<int>& heights);
     // 101. 对称二叉树   按照中序遍历和后续遍历依次来做
     bool isSymmetric(TreeNode* root);
-    // 面试题42. 连续子数组的最大和
+    // 面试题42. 连续子数组的最大和  动态规划
     int maxSubArray(vector<int>& nums);
+    // 1431. 拥有最多糖果的孩子  枚举
+    vector<bool> kidsWithCandies(vector<int>& candies, int extraCandies);
+    // 面试题64. 求1+2+…+n  ||的灵活运用避免使用条件语句
+    int sumNums(int n);
+    // 238. 除自身以外数组的乘积   前缀乘积+后缀乘积
+    vector<int> productExceptSelf(vector<int>& nums);
+    // 面试题29. 顺时针打印矩阵  模拟四个角
+    vector<int> spiralOrder(vector<vector<int>>& matrix);
+    // 128. 最长连续序列  哈希表
+    int longestConsecutive(vector<int>& nums);
+    // 126. 单词接龙 II
+    vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList);
+    bool one_diff(string& a, string& b);
+    
 };
 
-//  146. LRU缓存机制
+//  146. LRU缓存机制双向链表加哈希桶
 struct Node{
     Node* pre;
     Node* next;
@@ -156,3 +170,18 @@ public:
     Node Tail;
 };
 #endif /* lee_hpp */
+
+
+// 303. 区域和检索 - 数组不可变  前缀和（也算动态规划）
+class NumArray {
+public:
+    NumArray(vector<int>& nums);
+    vector<int> li;   // 不加&可以赋值成功
+    int sumRange(int i, int j);
+};
+
+/**
+ * Your NumArray object will be instantiated and called as such:
+ * NumArray* obj = new NumArray(nums);
+ * int param_1 = obj->sumRange(i,j);
+ */
