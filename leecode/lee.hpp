@@ -16,6 +16,7 @@
 #include <queue>
 #include <iostream>
 #include <stack>
+#include <numeric>
 using namespace std;
 
 class Solution {
@@ -133,7 +134,7 @@ public:
     int largestRectangleArea(vector<int>& heights);
     // 101. 对称二叉树   按照中序遍历和后续遍历依次来做
     bool isSymmetric(TreeNode* root);
-    // 面试题42. 连续子数组的最大和  动态规划
+    // 面试题42. 连续子数组的最大和  动态规划  或者是分治线段树，比较复杂
     int maxSubArray(vector<int>& nums);
     // 1431. 拥有最多糖果的孩子  枚举
     vector<bool> kidsWithCandies(vector<int>& candies, int extraCandies);
@@ -145,10 +146,57 @@ public:
     vector<int> spiralOrder(vector<vector<int>>& matrix);
     // 128. 最长连续序列  哈希表
     int longestConsecutive(vector<int>& nums);
-    // 126. 单词接龙 II
+    // 126. 单词接龙 II  图，广度优先搜索
     vector<vector<string>> findLadders(string beginWord, string endWord, vector<string>& wordList);
     bool one_diff(string& a, string& b);
-    
+    // 990. 等式方程的可满足性。并查集
+    bool equationsPossible(vector<string>& equations);
+    // 面试题46. 把数字翻译成字符串  动态规划
+    int translateNum(int num);
+    // 9. 回文数  不用转换字符串，/ %操作使用数字比较
+    bool isPalindrome(int x);
+    // 392. 判断子序列  动态规划
+    bool isSubsequence(string s, string t);
+    // 739. 每日温度  单调栈
+    vector<int> dailyTemperatures(vector<int>& T);
+    // 70. 爬楼梯 动态规划  矩阵快速幂
+    int climbStairs(int n);
+    // 746. 使用最小花费爬楼梯  动态规划
+    int minCostClimbingStairs(vector<int>& cost);
+    // 面试题 08.01. 三步问题  动态规划
+    int waysToStep(int n);
+    // 15. 三数之和     排序+双指针法
+    vector<vector<int>> threeSum(vector<int>& nums);
+    vector<int> quicksort(vector<int>& nums);
+    vector<int> quicksort_join(const vector<int>& left, int mid, const vector<int>& right);
+    // 面试题 17.16. 按摩师  动态规划
+    int massage(vector<int>& nums);
+    // 121. 买卖股票的最佳时机  动态规划
+    int maxProfit(vector<int>& prices);
+    // 338. 比特位计数  动态规划+位运算 
+    vector<int> countBits(int num);
+};
+
+
+// 990. 等式方程的可满足性 并查集
+class UnionFind {
+private:
+    vector<int> parent;
+public:
+    UnionFind() {
+        parent.resize(26);
+        iota(parent.begin(), parent.end(), 0);          //初始化，用0-25进行填充
+    }
+    int find(int index) {                               //寻找index对应的字母它的根节点是谁
+        if (index == parent[index]) {                   //如果就是根节点，就返回根节点的索引
+            return index;
+        }
+        parent[index] = find(parent[index]);            //如果不是，则继续向上寻找
+        return parent[index];
+    }
+    void unite(int index1, int index2) {                //因为两者相等，所以需要联合
+        parent[find(index1)] = find(index2);            //将index1的根节点指向index2的根节点
+    }
 };
 
 //  146. LRU缓存机制双向链表加哈希桶

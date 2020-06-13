@@ -470,7 +470,7 @@ bool Solution::validPalindrome(string s){  //分两个方向
 
 int Solution::findTheLongestSubstring(string s){
     string vowel = "aeiou";
-    int length = s.length();
+    int length = int(s.length());
     for (int i=length; length>0; i--) {
         for (int j=0; j<=length-i; j++) {
             string sub = s.substr(j,i);
@@ -501,7 +501,7 @@ int Solution::times_findTheLongestSubstring(string s, char c){
 }
 
 int Solution::official_findTheLongestSubstring(string s){
-    int ans = 0, status = 0, n = s.length();
+    int ans = 0, status = 0, n = int(s.length());
     vector<int> pos(1 << 5, -1);  // 长度为2^5=32的，值都为-1的一位数组
     pos[0] = 0;  // 把第一位赋值为0
     for (int i = 0; i < n; ++i) {
@@ -536,7 +536,7 @@ Solution::TreeNode* Solution::buildTree(vector<int> &preorder, vector<int> &inor
         hash.insert({inorder[i],i});
     }
     TreeNode* root = new TreeNode(-1);
-    root->left = lr_buildTree(hash, preorder, inorder, 0, preorder.size()-1, 0, inorder.size()-1);
+    root->left = lr_buildTree(hash, preorder, inorder, 0, int(preorder.size()-1), 0, inorder.size()-1);
     return root->left;
 }
 
@@ -569,7 +569,7 @@ Solution::TreeNode* Solution::lr_buildTree(unordered_map<int, int> hash, vector<
 }
 
 string Solution::minWindow(string s, string t){
-    int t_length = t.size();
+    int t_length = int(t.size());
     unordered_map<char, int> T;
     for (int i=0; i<t.size(); i++) {
         if (T.find(t[i])==T.end()) {
@@ -629,7 +629,7 @@ string Solution::minWindow_improve(string s, string t){
             ++ori[c];
         }
         int l = 0, r = -1;
-        int len = INT_MAX, ansL = -1, ansR = -1;
+    int len = INT_MAX, ansL = -1;//, ansR = -1;
 
         while (r < int(s.size())) {
             if (ori.find(s[++r]) != ori.end()) {
@@ -910,7 +910,7 @@ int Solution::largestRectangleArea(vector<int> &heights){
 }
 
 bool Solution::isSymmetric(TreeNode *root){  //关键是中序遍历和后续遍历要理解，有递归输出和迭代输出两种
-    TreeNode* Root = root;
+    //TreeNode* Root = root;
     TreeNode* rl = root;
     TreeNode* rr = root;
     stack<TreeNode*> tree_left;
@@ -1171,4 +1171,251 @@ bool Solution::one_diff(string& a, string& b){
         }
     }
     return (diff==1 ? true:false);
+}
+
+bool Solution::equationsPossible(vector<string> &equations){
+    UnionFind uf;                                              // 声明根节点
+    for (const string& str: equations) {
+        if (str[1] == '=') {
+            int index1 = str[0] - 'a';                         //获取字符的相对位置，若为a，则index为0
+            int index2 = str[3] - 'a';
+            uf.unite(index1, index2);
+        }
+    }
+    for (const string& str: equations) {
+        if (str[1] == '!') {
+            int index1 = str[0] - 'a';
+            int index2 = str[3] - 'a';
+            if (uf.find(index1) == uf.find(index2)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+int Solution::translateNum(int num){            //如果使用递归，返回的即是结果数量1等等
+    string s = to_string(num);
+    int length = int(s.size());
+    int p=0, q=0, r=1;                          //r保存结果数量
+    for (int i=0; i<length; i++) {
+        p=q;                                    //p保存i-2前缀方法数量
+        q=r;                                    //q保存i-1前缀方法数量
+        if (i==0) {
+            continue;
+        }
+        auto pre = s.substr(i-1,2);
+        if (pre<="25" && pre>="10") {
+            r+=p;
+        }
+    }
+    return r;
+}
+
+bool Solution::isPalindrome(int x){
+    string s = to_string(x);
+    int length = int(s.size());
+    int l=0, r=length-1;
+    while (l<=length-2 && r>=1) {
+        if (s[l]!=s[r]) {
+            return false;
+        }
+        l++;
+        r--;
+    }
+    return true;
+}
+
+bool Solution::isSubsequence(string s, string t){
+    int length = int(s.size());                         // 短串的长度
+    int L = int(t.size());                              // 长串的长度
+    vector<bool> res(length+1, false);
+    res[0] = true;
+    int idx = 0;
+    for (int i=0; i<length; i++) {
+        while (idx<L) {
+            if (t[idx]==s[i]) {
+                res[i+1] = res[i];                      // 状态转移方程
+                break;
+            }else{
+                idx++;
+            }
+        }
+    }
+    return res[length];
+}
+
+vector<int> Solution::dailyTemperatures(vector<int> &T){
+    /*
+             int n = T.size();
+             vector<int> ans(n);
+             stack<int> s;
+             for (int i = 0; i < n; ++i) {
+                 while (!s.empty() && T[i] > T[s.top()]) {
+                     int previousIndex = s.top();
+                     ans[previousIndex] = i - previousIndex;
+                     s.pop();
+                 }
+                 s.push(i);
+             }
+             return ans;
+     */
+    stack<int> S;
+    vector<int> res(int(T.size()));
+    S.push(0);
+    int idx = 1;
+    while (!S.empty()) {
+        while (!S.empty() && T[idx]>T[S.top()]) {
+            int tmp = S.top();                              //使用tmp保存S.top()结果之后，发现运行效率增加
+            res[tmp]=idx-tmp;                               //推测是因为top方法较慢，最好用中间值保存
+            S.pop();
+        }
+        S.push(idx);
+        if (idx==T.size()-1) {
+            break;
+        }
+        idx++;
+    }
+    return res;
+}
+
+int Solution::climbStairs(int n){
+    int first = 1;
+    int second = 1;
+    for (int i=2; i<=n; i++) {
+        int tmp = second;
+        second = tmp+first;
+        first = tmp;
+    }
+    return second;
+}
+
+int Solution::minCostClimbingStairs(vector<int> &cost){
+    int first = 0;
+    int second = cost[0];
+    for (int i=2; i<int(cost.size()); i++) {
+        int tmp = second;
+        second = min(first, second)+cost[i];
+        first = tmp;
+    }
+    return (first>second ? second:first);
+}
+
+int Solution::waysToStep(int n){
+    vector<int> res(n+1);
+    if (n==1) {
+        return 1;
+    }
+    if (n==2) {
+        return 2;
+    }
+    if (n==3) {
+        return 4;
+    }
+    res[0] = 0;
+    res[1] = 1;
+    res[2] = 2;
+    res[3] = 4;
+    for (int i=4; i<=n; i++) {
+        res[i] = ((res[i-1]%1000000007+res[i-2]%1000000007)%1000000007+res[i-3])%1000000007;
+    }
+    return res[n];
+}
+
+vector<vector<int>> Solution::threeSum(vector<int> &nums){
+    // 思想：还是使用遍历解决，避免出现重复元素是关键，将三数之和改为两数之和
+    vector<int> sorted_nums = quicksort(nums);                          //首先进行排序
+    vector<vector<int>> res;
+    int length = int(nums.size());
+    for (int i=0; i<length; i++) {                                      //i保存两数之和的目标值
+        if (i>0 && sorted_nums[i]==sorted_nums[i-1]) {                  //如果说数组存在重复，则忽略
+            continue;
+        }
+        int target = -sorted_nums[i];
+        int k = length-1;                                               //k可以放在j的外层，因为数组有序
+                                                                        //随着j的增大，k必然减小
+        for (int j=i+1; j<length; j++) {
+            if (j>i+1 && sorted_nums[j]==sorted_nums[j-1]) {            //避免重复
+                continue;
+            }
+            while (j<k && sorted_nums[j]+sorted_nums[k]>target) {
+                k--;
+            }
+            if (j==k) {
+                break;
+            }
+            if (sorted_nums[j]+sorted_nums[k]==target) {
+                res.push_back({sorted_nums[i],sorted_nums[j],sorted_nums[k]});
+            }
+        }
+    }
+    return res;
+}
+
+vector<int> Solution::quicksort(vector<int>& nums){
+    if (nums.size()>=2) {
+        int mid = nums[0];
+        vector<int> left;
+        vector<int> right;
+        for (int i=1; i<int(nums.size()); i++) {
+            if (nums[i]<mid) {
+                left.push_back(nums[i]);
+            }else{
+                right.push_back(nums[i]);
+            }
+        }
+        return quicksort_join(quicksort(left), mid, quicksort(right));
+    }
+    return nums;
+}
+
+vector<int> Solution::quicksort_join(const vector<int>& left, int mid, const vector<int>& right){
+    vector<int> res;
+    for (int n:left) {
+        res.push_back(n);
+    }
+    res.push_back(mid);
+    for (int n:right) {
+        res.push_back(n);
+    }
+    return res;
+}
+
+int Solution::massage(vector<int> &nums){
+    int length = int(nums.size());
+    if (length==0) {
+        return NULL;
+    }
+    if (length==1) {
+        return nums[0];
+    }
+    int first = 0;
+    int second = nums[0];
+    for (int i=1; i<length; i++) {
+        int tmp = second;
+        second = max(nums[i]+first, second);
+        first = tmp;
+    }
+    return second;
+}
+
+int Solution::maxProfit(vector<int> &prices){
+    int length = int(prices.size());
+    if(length==0){return NULL;}
+    int mini = prices[0];
+    int profit = 0;
+    for (int i=1; i<length; i++) {
+        mini = min(prices[i], mini);
+        profit = (prices[i]-mini>profit ? prices[i]-mini:profit);
+    }
+    return profit;
+}
+
+vector<int> Solution::countBits(int num){
+    vector<int> res(num+1);
+    res[0] = 0;
+    for (int i=1; i<=num; i++) {
+        res[i] = res[i&(i-1)]+1;
+    }
+    return res;
 }
