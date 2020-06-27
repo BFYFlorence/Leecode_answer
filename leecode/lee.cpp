@@ -1419,3 +1419,294 @@ vector<int> Solution::countBits(int num){
     }
     return res;
 }
+
+int Solution::findBestValue(vector<int> &arr, int target){
+    sort(arr.begin(), arr.end());                           //首先进行排序
+    int length = int(arr.size());
+    int sum = 0;
+    for(int n:arr){                                         //求数组和
+        sum += n;
+    }
+    // cout << "sum:" << sum << endl;
+    int diff = abs(sum-target);                             //从后向前遍历，找到与目标值之差不再增大的索引
+    int res = arr.back();
+    int backward_sum = arr.back();
+    int idx = length-1;
+    for(int i=length-2; i>=0; i--){
+        int sum_tmp = sum-backward_sum+arr[i]*(length-1-i);
+        int diff_tmp = abs(sum_tmp-target);
+        if (diff_tmp>diff) {
+            break;
+        }else{
+            diff = diff_tmp;
+            res = arr[i];
+            backward_sum += arr[i];
+            idx = i;
+        }
+    }
+    //cout << "idx:" << idx << endl;
+    //cout << arr.front() << endl;
+    if (idx==0) {                                                   //如果说是直到找到第一个值并且大于平均，则只在两个值内取舍
+        int res_tmp = target/arr.size();
+        if (res_tmp<=arr.front()) {
+            int first = abs(target-res_tmp*int(arr.size()));
+            int second = abs((res_tmp+1)*int(arr.size())-target);
+            if (first>second) {
+                return res_tmp+1;
+            }else{
+                return res_tmp;
+            }
+        }else{                                          //否则在第一个值和第二个值之间进行寻找
+            diff = sum-(arr[idx]+arr[idx+1]*(length-1));
+            //cout << diff << endl;
+            for (int i=arr[idx]+1; i<arr[idx+1]; i++) {
+                int sum_tmp = sum-backward_sum+arr[idx]+i*(length-1-idx);
+                int diff_tmp = abs(sum_tmp-target);
+                if(diff_tmp<diff){
+                    res = i;
+                    diff = diff_tmp;
+                }
+            }
+        }
+    }else{                                              //如idx不为0，
+        //cout << "idx:" << idx << endl;
+        for (int i=arr[idx-1]+1; i<arr[idx]; i++) {
+            //cout << "i:" << i << endl;
+            // cout << backward_sum << endl;
+            int sum_tmp = sum-backward_sum+i*(length-idx);
+            int diff_tmp = abs(sum_tmp-target);
+            if(diff_tmp<diff){
+                res = i;
+                diff = diff_tmp;
+            }
+        }
+    }
+    return res;
+}
+
+string Solution::longestCommonPrefix(vector<string> &strs){
+    int length = int(strs.size());
+    int mini = int(strs[0].size());
+    string min_s = strs[0];
+    for (int i=1; i<length; i++) {
+        if (strs[i].size()<mini) {
+            mini = int(strs[i].size());
+            min_s = strs[i];
+        }
+    }
+    int idx = -1;
+    for (int i=0; i<mini; i++) {
+        bool con = true;
+        for (int j=0; j<length; j++) {
+            if (strs[j][i]!=min_s[i]) {
+                con = false;
+                break;
+            }
+        }
+        if (!con) {
+            break;
+        }
+        idx = i;
+    }
+    string res = (idx==-1 ? "":min_s.substr(0,idx+1));
+    return res;
+}
+/* java 代码。// 297. 二叉树的序列化与反序列化 用栈也可以实现二叉树的遍历,但是是层序遍历
+ public class Codec {
+     public String serialize(TreeNode root) {
+         //tree: [v1,v2,null,...]
+         StringBuilder res = new StringBuilder("[");
+         Queue<TreeNode> queue = new LinkedList();
+         queue.add(root);
+         while(!queue.isEmpty()){
+             TreeNode cur = queue.remove();
+             if(cur == null){
+                 res.append("null,");
+             }else{
+                 res.append(cur.val + ",");
+                 queue.add(cur.left);
+                 queue.add(cur.right);
+             }
+         }
+         res.setLength(res.length() - 1);
+         res.append("]");
+         return res.toString();
+     }
+
+     public TreeNode deserialize(String data) {
+         String[] nodes = data.substring(1, data.length()-1).split(",");
+         TreeNode root = getNode(nodes[0]);
+         Queue<TreeNode> parents = new LinkedList();
+         TreeNode parent = root;
+         boolean isLeft = true;
+         for(int i = 1; i < nodes.length; i++){
+             TreeNode cur = getNode(nodes[i]);
+             if(isLeft){
+                 parent.left = cur;
+             }else{
+                 parent.right = cur;
+             }
+             if(cur != null){
+                 parents.add(cur);
+             }
+             isLeft = !isLeft;
+             if(isLeft){
+                 parent = parents.poll();
+             }
+         }
+         return root;
+     }
+
+     private TreeNode getNode(String val){
+         if(val.equals("null")){
+             return null;
+         }
+         return new TreeNode(Integer.valueOf(val));
+     }
+ }
+ */
+string Codec::serialize(TreeNode *root){
+    stack<TreeNode*> s;
+    string res = "[";
+    TreeNode *node = root;
+    res += (to_string(node->val)+",");
+    while (node!=NULL || !s.empty()) {
+        while (node!=NULL) {
+            s.push(node);
+            node = node->left;
+            if (node!=NULL) {
+                res += (to_string(node->val)+",");
+            }else{
+                res += "null,";
+            }
+        }
+        if (!s.empty()) {
+            node = s.top();
+            s.pop();
+            node = node->right;
+            if (node!=NULL) {
+                res += (to_string(node->val)+",");
+            }else{
+                res += "null,";
+            }
+        }
+    }
+    res[res.size()-1] = ']';
+    return res;
+}
+
+TreeNode* Codec::deserialize(string data){
+    vector<string> list;
+    string content = data.substr(1,data.size()-1);
+    string ele = "";
+    for(char n:content){
+        if (n!=',' && n!=']') {
+            ele += n;
+        }else{
+            list.push_back(ele);
+            ele = "";
+        }
+    }
+    
+    return rdeserialize(list);
+}
+
+TreeNode* Codec::rdeserialize(vector<string> list){
+    if (list[0]=="null") {
+        list.erase(list.begin());
+        return NULL;
+    }
+    TreeNode* root = new TreeNode(stoi(list[0]));
+    list.erase(list.begin());
+    root->left = rdeserialize(list);
+    root->right = rdeserialize(list);
+    return root;
+}
+
+
+/*
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ 
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+    stack<TreeNode*> s;
+    string res = "[";
+    TreeNode *node = root;
+    res += (to_string(node->val)+",");
+    while (node!=NULL || !s.empty()) {
+        while (node!=NULL) {
+            s.push(node);
+            node = node->left;
+            if (node!=NULL) {
+                res += (to_string(node->val)+",");
+            }else{
+                res += "null,";
+            }
+        }
+        if (!s.empty()) {
+            node = s.top();
+            s.pop();
+            node = node->right;
+            if (node!=NULL) {
+                res += (to_string(node->val)+",");
+            }else{
+                res += "null,";
+            }
+        }
+    }
+    res[res.size()-1] = ']';
+    return res;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+    vector<string> list;
+    string content = data.substr(1,data.size()-1);
+    string ele = "";
+    for(char n:content){
+        if (n!=',' && n!=']') {
+            ele += n;
+        }else{
+            list.push_back(ele);
+            ele = "";
+        }
+    }
+    
+    return rdeserialize(list);
+    }
+    TreeNode* rdeserialize(vector<string> list){
+        if (list[0]=="null") {
+            list.erase(list.begin());
+            return NULL;
+        }
+        TreeNode* root = new TreeNode(stoi(list[0]));
+        list.erase(list.begin());
+        root->left = rdeserialize(list);
+        root->right = rdeserialize(list);
+        return root;
+    }
+};
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec;
+// codec.deserialize(codec.serialize(root));
+*/
+
+TreeNode* Codec::preorder_recursion(TreeNode *root){
+    if (!root) {
+        return NULL;
+    }
+    cout << root->val << endl;
+    preorder_recursion(root->left);
+    preorder_recursion(root->right);
+    return NULL;
+}

@@ -173,10 +173,33 @@ public:
     int massage(vector<int>& nums);
     // 121. 买卖股票的最佳时机  动态规划
     int maxProfit(vector<int>& prices);
-    // 338. 比特位计数  动态规划+位运算 
+    // 338. 比特位计数  动态规划+位运算
     vector<int> countBits(int num);
+    // 1300. 转变数组后最接近目标值的数组和
+    int findBestValue(vector<int>& arr, int target);
+    int sumarr(vector<int> &arr, int mini);
+    // 14. 最长公共前缀
+    string longestCommonPrefix(vector<string>& strs);
+    
 };
+// 297. 二叉树的序列化与反序列化
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+class Codec {
+public:
 
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root);
+    
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data);
+    TreeNode* rdeserialize(vector<string> list);
+    TreeNode* preorder_recursion(TreeNode* root);
+};
 
 // 990. 等式方程的可满足性 并查集
 class UnionFind {
