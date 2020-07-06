@@ -8,13 +8,17 @@
 #include "lee.hpp"
 int main(int argc, const char * argv[]) {
     Solution sol = Solution();
-    Codec cod = Codec();
+    NNode* node5 = new NNode(5);
+    NNode* node6 = new NNode(6);
+    vector<NNode*> child_3{node5,node6};
+    NNode* node3 = new NNode(3);
+    node3->children = child_3;
+    NNode* node2 = new NNode(2);
+    NNode* node4 = new NNode(4);
+    vector<NNode*> child_1{node3,node2,node4};
+    NNode* node1 = new NNode(1);
+    node1->children = child_1;
     
-    TreeNode *root = new TreeNode(1);
-    root->left = new TreeNode(2);
-    root->right = new TreeNode(3);
-    root->right->left = new TreeNode(4);
-    root->right->right = new TreeNode(5);
-    cod.preorder_recursion(root);
+    sol.postorder(node1);
 
 }

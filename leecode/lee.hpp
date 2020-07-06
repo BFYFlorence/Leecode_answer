@@ -18,6 +18,30 @@
 #include <stack>
 #include <numeric>
 using namespace std;
+/* 二叉树 */
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+/* N叉树 */
+class NNode {
+public:
+    int val;
+    vector<NNode*> children;
+
+    NNode() {}
+
+    NNode(int _val) {
+        val = _val;
+    }
+
+    NNode(int _val, vector<NNode*> _children) {
+        val = _val;
+        children = _children;
+    }
+};
 
 class Solution {
 public:
@@ -101,12 +125,6 @@ public:
     string longestPalindrome(string s);
     bool valid_palindrome(string s, int f, int l);
     // 105. 从前序与中序遍历序列构造二叉树  递归法
-    struct TreeNode {
-         int val;
-         TreeNode *left;
-         TreeNode *right;
-         TreeNode(int x) : val(x), left(NULL), right(NULL) {}
-    };
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder);
     TreeNode* lr_buildTree(unordered_map<int, int> hash,vector<int>& preorder, vector<int>& inorder, int preleft, int preright,int inleft, int inright);
     
@@ -180,15 +198,30 @@ public:
     int sumarr(vector<int> &arr, int mini);
     // 14. 最长公共前缀
     string longestCommonPrefix(vector<string>& strs);
-    
+    // 面试题 04.02. 最小高度树
+    TreeNode* sortedArrayToBST(vector<int>& nums);
+    TreeNode* sortedArrayToBST_dfs(int l, int r, vector<int> nums);
+    // 剑指 Offer 55 - I. 二叉树的深度
+    int maxDepth(TreeNode* root);
+    // 剑指 Offer 27. 二叉树的镜像
+    TreeNode* mirrorTree(TreeNode* root);
+    // 938. 二叉搜索树的范围和
+    int rangeSumBST(TreeNode* root, int L, int R);
+    // 617. 合并二叉树
+    TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2);
+    // 700. 二叉搜索树中的搜索
+    TreeNode* searchBST(TreeNode* root, int val);
+    // 590. N叉树的后序遍历
+    vector<int> postorder(NNode* root);
+    // 589. N叉树的前序遍历
+    vector<int> preorder(NNode* root);
+    void preorder_visit(NNode* root, stack<NNode*>& s, vector<int>& res);
+    // 剑指 Offer 54. 二叉搜索树的第k大节点
+    int kthLargest(TreeNode* root, int k);
+    void kthLargest_visit(TreeNode* root, stack<TreeNode*>& s);
 };
 // 297. 二叉树的序列化与反序列化
-struct TreeNode {
-    int val;
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
-};
+
 class Codec {
 public:
 

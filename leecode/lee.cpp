@@ -527,7 +527,7 @@ int Solution::official_findTheLongestSubstring(string s){
     return ans;
 }
 
-Solution::TreeNode* Solution::buildTree(vector<int> &preorder, vector<int> &inorder){
+TreeNode* Solution::buildTree(vector<int> &preorder, vector<int> &inorder){
     if (preorder.size()==0) {
         return NULL;
     }
@@ -540,7 +540,7 @@ Solution::TreeNode* Solution::buildTree(vector<int> &preorder, vector<int> &inor
     return root->left;
 }
 
-Solution::TreeNode* Solution::lr_buildTree(unordered_map<int, int> hash, vector<int> &preorder, vector<int> &inorder, int preleft, int preright, int inleft, int inright){
+TreeNode* Solution::lr_buildTree(unordered_map<int, int> hash, vector<int> &preorder, vector<int> &inorder, int preleft, int preright, int inleft, int inright){
     
     int root_idx = 0;  // 中序遍历中根节点的索引值
     
@@ -1709,4 +1709,165 @@ TreeNode* Codec::preorder_recursion(TreeNode *root){
     preorder_recursion(root->left);
     preorder_recursion(root->right);
     return NULL;
+}
+
+TreeNode* Solution::sortedArrayToBST(vector<int> &nums){
+    return sortedArrayToBST_dfs(0, int(nums.size())-1, nums);
+}
+TreeNode* Solution::sortedArrayToBST_dfs(int l, int r, vector<int> nums){
+    if (r<l || l>r) {
+        return NULL;
+    }
+    int idx = (r+l+1)/2;                            /* 通过均分的方法达到平衡的目的 */
+    int x = nums[idx];
+    TreeNode* root = new TreeNode(x);
+    root->left = sortedArrayToBST_dfs(l, idx-1, nums);
+    root->right = sortedArrayToBST_dfs(idx+1, r, nums);
+    return root;
+}
+
+int Solution::maxDepth(TreeNode *root){             /* 有点类似于动态规划 */
+    if (!root) {
+        return 0;
+    }
+    return max(maxDepth(root->left),maxDepth(root->right))+1;
+}
+
+TreeNode* Solution::mirrorTree(TreeNode *root){     /* 传入root，返回root */
+    if (!root) {                                    /* 中间细节不必考虑太过清楚 */
+        return NULL;
+    }
+    TreeNode* tmp = root->left;
+    root->left = mirrorTree(root->right);
+    root->right = mirrorTree(tmp);
+    return root;
+}
+
+int Solution::rangeSumBST(TreeNode *root, int L, int R){
+    if (!root) {
+        return NULL;
+    }
+    int sum = 0;
+    stack<TreeNode*> s;
+    s.push(root);
+    while (!s.empty()) {
+        TreeNode* node = s.top();
+        s.pop();
+        if (L<=node->val && node->val<=R) {
+            sum += node->val;
+            if (node->right) {s.push(node->right);}
+            if (node->left) {s.push(node->left);}
+        }
+        if (node->val<L) {
+            if (node->right) {s.push(node->right);}
+        }
+        if (node->val>R) {
+            if (node->left) {s.push(node->left);}
+        }
+    }
+    return sum;
+}
+
+TreeNode* Solution::mergeTrees(TreeNode *t1, TreeNode *t2){
+    if (!t1 && !t2) {
+        return NULL;
+    }
+    if (t1 && t2) {
+        TreeNode* node = new TreeNode(t1->val+t2->val);
+        node->left = mergeTrees(t1->left, t2->left);
+        node->right = mergeTrees(t1->right, t2->right);
+        return node;
+    }else if(t1){
+        return t1;
+    }else{
+        return t2;
+    }
+}
+
+TreeNode* Solution::searchBST(TreeNode *root, int val){
+    stack<TreeNode*> s;
+    s.push(root);
+    while (!s.empty()) {
+        TreeNode* node = s.top();
+        s.pop();
+        if (node->val==val) {
+            return node;
+        }
+        if (node->right) {s.push(node->right);}
+        if (node->left) {s.push(node->left);}
+    }
+    return NULL;
+}
+
+vector<int> Solution::postorder(NNode *root){
+    //[children of v1], v1, [children of v2], v2, [children of v3], v3, u
+    //u, v3, [children of v3]', v2, [children of v2]', v1, [children of v1]'
+    //后序遍历和前序遍历类似，只不过子节点的顺序是反的
+    vector<int> res;
+    if (!root) {
+        return res;
+    }
+    stack<NNode*> s;
+    s.push(root);
+    while (!s.empty()) {
+        NNode* node = s.top();
+        s.pop();
+        int len = int(node->children.size());
+        cout << node->val << endl;
+        res.push_back(node->val);
+        for (int i=0; i<len; i++) {
+            s.push(node->children[i]);
+        }
+    }
+    reverse(res.begin(), res.end());
+    return res;
+}
+
+vector<int> Solution::preorder(NNode *root){
+    vector<int> res;
+    stack<NNode*> s;
+    while (true) {
+        preorder_visit(root, s, res);
+        if (s.empty()) {break;}
+        root = s.top();
+        s.pop();
+    }
+    return res;
+}
+
+void Solution::preorder_visit(NNode *root, stack<NNode *>& s, vector<int>& res){
+    while (root) {
+        res.push_back(root->val);
+        if (root->children.size()>1) {
+            for (int i=int(root->children.size())-1; i>0; i--) {
+                s.push(root->children[i]);
+            }
+            root = root->children[0];
+        }else if(root->children.size()){
+            root = root->children[0];
+        }else{
+            root = NULL;
+        }
+    }
+}
+
+int Solution::kthLargest(TreeNode *root, int k){
+    stack<TreeNode*> s;
+    vector<int> res;
+    while (true) {
+        kthLargest_visit(root, s);
+        if (s.empty()) {break;}
+        root = s.top();
+        s.pop();
+        res.push_back(root->val);
+        root = root->right;
+    }
+    return res[res.size()-k];
+}
+
+void Solution::kthLargest_visit(TreeNode *root, stack<TreeNode*> &s){
+    while (root) {
+        s.push(root);
+        root = root->left;
+    }
 }
