@@ -219,6 +219,11 @@ public:
     // 剑指 Offer 54. 二叉搜索树的第k大节点
     int kthLargest(TreeNode* root, int k);
     void kthLargest_visit(TreeNode* root, stack<TreeNode*>& s);
+    // 559. N叉树的最大深度
+    int maxDepthN(NNode* root);
+    // 897. 递增顺序查找树
+    TreeNode* increasingBST(TreeNode* root);
+    void increasingBST_visit(stack<TreeNode*>& s, TreeNode* root);
 };
 // 297. 二叉树的序列化与反序列化
 

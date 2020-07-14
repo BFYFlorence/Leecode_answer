@@ -1715,7 +1715,7 @@ TreeNode* Solution::sortedArrayToBST(vector<int> &nums){
     return sortedArrayToBST_dfs(0, int(nums.size())-1, nums);
 }
 TreeNode* Solution::sortedArrayToBST_dfs(int l, int r, vector<int> nums){
-    if (r<l || l>r) {
+    if (l>r) {
         return NULL;
     }
     int idx = (r+l+1)/2;                            /* 通过均分的方法达到平衡的目的 */
@@ -1866,6 +1866,50 @@ int Solution::kthLargest(TreeNode *root, int k){
 }
 
 void Solution::kthLargest_visit(TreeNode *root, stack<TreeNode*> &s){
+    while (root) {
+        s.push(root);
+        root = root->left;
+    }
+}
+
+int Solution::maxDepthN(NNode *root){
+    if (!root) {
+        return 0;
+    }
+    vector<int> res;
+    if (root->children.size()) {
+        for(auto node:root->children){
+            res.push_back(maxDepthN(node)+1);
+        }
+    }else{
+        res.push_back(1);
+    }
+    sort(res.begin(),res.end());
+    return res[res.size()-1];
+}
+
+TreeNode* Solution::increasingBST(TreeNode *root){
+    stack<TreeNode*> s;
+    vector<int> res;
+    while (true) {
+        increasingBST_visit(s, root);
+        if (s.empty()) {break;}
+        root = s.top();
+        s.pop();
+        res.push_back(root->val);
+        root = root->right;
+    }
+    root = new TreeNode(res[0]);
+    TreeNode* R = root;
+    for (int i=1; i<res.size(); i++) {
+        TreeNode* node = new TreeNode(res[i]);
+        root->right = node;
+        root = node;
+    }
+    return R;
+}
+
+void Solution::increasingBST_visit(stack<TreeNode *> &s, TreeNode *root){
     while (root) {
         s.push(root);
         root = root->left;
