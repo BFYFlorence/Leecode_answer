@@ -224,6 +224,7 @@ public:
     // 897. 递增顺序查找树
     TreeNode* increasingBST(TreeNode* root);
     void increasingBST_visit(stack<TreeNode*>& s, TreeNode* root);
+    
 };
 // 297. 二叉树的序列化与反序列化
 
