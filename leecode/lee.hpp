@@ -226,6 +226,8 @@ public:
     void increasingBST_visit(stack<TreeNode*>& s, TreeNode* root);
     
     
+    
+    
 };
 // 297. 二叉树的序列化与反序列化
 
